@@ -17,7 +17,21 @@ app.get('/api/posts', (req, res) => {
 app.get('/api/posts/:id', (req, res) => {
   const id = Number(req.params.id);
   const post = posts.find((one) => one.id === id);
+  if (!post) {
+    res.status(404).json({
+      message: '그런 게시물은 존재하지 않습니다.'
+    });
+    return;
+  }
+
   res.json(post);
+});
+
+// 404 처리를 기본설정에서 커스텀설정으로 변경
+app.use((req, res) => {
+  res.status(404).json({
+    message: '그런 주소는 존재하지 않습니다.'
+  });
 });
 
 app.listen(3000, () => {
