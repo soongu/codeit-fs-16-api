@@ -8,10 +8,7 @@ const stories = [
   { username: 'seungwoo' }
 ];
 
-const MONGO_URL =
-  '';
-
-await mongoose.connect(MONGO_URL);
+await mongoose.connect(process.env.MONGO_URL);
 
 await Story.deleteMany({});
 await Story.insertMany(stories);
