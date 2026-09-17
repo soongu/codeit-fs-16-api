@@ -3,6 +3,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import Post from './models/Post.js';
 
+const PORT = process.env.PORT ?? 3000;
+
 const app = express();
 
 // 모든 요청 초입에 작동해서 클라이언트가 보낸 json을 재조립
@@ -110,6 +112,6 @@ app.use((err, req, res, next) => {
 });
 
 
-app.listen(3000, () => {
-  console.log('서버가 3000번 포트에서 기다리고 있어요.');
+app.listen(PORT, () => {
+  console.log(`서버가 ${PORT}번 포트에서 기다리고 있어요.`);
 });

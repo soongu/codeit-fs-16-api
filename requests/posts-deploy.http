@@ -1,0 +1,45 @@
+### 게시물 목록
+# @name list
+GET https://codeit-fs-16-api.onrender.com/api/posts
+
+### 2번 게시물 하나
+GET https://codeit-fs-16-api.onrender.com/api/posts/{{list[1]._id}}
+
+### 없는 게시물
+GET https://codeit-fs-16-api.onrender.com/api/posts/2
+
+### 없는 주소
+GET https://codeit-fs-16-api.onrender.com/api/comments
+
+### 게시물 올리기
+# @name created
+POST https://codeit-fs-16-api.onrender.com/api/posts
+Content-Type: application/json
+
+{
+  "username": "pikachu",
+  "profileImage": "https://picsum.photos/seed/yuna/40/40",
+  "postImage": "https://picsum.photos/seed/post4/600/600",
+  "postAlt": "창밖으로 본 저녁 하늘 사진",
+  "content": "오늘의 한 장 📷"
+}
+
+### 게시물 올리기 (빈 페이로드)
+POST http://localhost:3000/api/posts
+Content-Type: application/json
+
+{
+
+}
+
+### 하트 수 고치기
+PATCH https://codeit-fs-16-api.onrender.com/api/posts/{{created._id}}
+Content-Type: application/json
+
+{
+  "likeCount": 880
+}
+
+
+### 게시물 지우기
+DELETE https://codeit-fs-16-api.onrender.com/api/posts/{{created._id}}
