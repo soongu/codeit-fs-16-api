@@ -1,6 +1,10 @@
 // ~/instagram-api/app.js
 import express from 'express';
+import mongoose from 'mongoose';
 import { posts } from './data/posts.js';
+
+const MONGO_URL =
+  '';
 
 let nextId = 4;
 
@@ -8,6 +12,10 @@ const app = express();
 
 // 모든 요청 초입에 작동해서 클라이언트가 보낸 json을 재조립
 app.use(express.json());
+
+// 몽고디비 연결
+await mongoose.connect(MONGO_URL);
+console.log('데이터베이스에 연결됐어요.');
 
 app.get('/', (req, res) => {
   res.send('인스타그램 서버가 살아 있어요');
