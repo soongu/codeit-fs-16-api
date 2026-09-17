@@ -9,3 +9,15 @@ GET http://localhost:3000/api/posts/999
 
 ### 없는 주소
 GET http://localhost:3000/api/comments
+
+### 게시물 올리기
+POST http://localhost:3000/api/posts
+Content-Type: application/json
+
+{
+  "username": "yuna",
+  "profileImage": "https://picsum.photos/seed/yuna/40/40",
+  "postImage": "https://picsum.photos/seed/post4/600/600",
+  "postAlt": "창밖으로 본 저녁 하늘 사진",
+  "content": "오늘의 한 장 📷"
+}
