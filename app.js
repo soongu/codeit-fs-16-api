@@ -34,6 +34,14 @@ app.get('/api/posts/:id', (req, res) => {
 
 app.post('/api/posts', (req, res) => {
 
+  // 입력값 검증 (validation)
+  const { username, postImage } = req.body;
+
+  if (!username || !postImage) {
+    res.status(400).json({ message: 'username과 postImage는 꼭 있어야 해요' });
+    return;
+  }
+
   // 실제로 게시물을 추가해 줘야함.
   const newPost = {
     ...req.body,
@@ -47,6 +55,38 @@ app.post('/api/posts', (req, res) => {
   posts.push(newPost);
 
   res.status(201).json(newPost);
+});
+
+// 좋아요 수정요청
+app.patch('/api/posts/:id', (req, res) => {
+
+  const id = Number(req.params.id);
+  const found = posts.find(p => p.id === id);
+
+  if (!found) {
+    res.status(404).json({ message: '그런 게시물은 없어요' });
+    return;
+  }
+
+  found.likeCount = req.body.likeCount;
+
+  res.json(found);
+});
+
+// 게시물 삭제
+app.delete('/api/posts/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const index = posts.findIndex((p) => p.id === id);
+
+  if (index === -1) {
+    res.status(404).json({ message: '그런 게시물은 없어요' });
+    return;
+  }
+
+  const deleted = posts[index];
+  posts.splice(index, 1);
+
+  res.json(deleted);
 });
 
 

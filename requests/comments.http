@@ -1,0 +1,12 @@
+### 댓글 목록
+GET http://localhost:4000/api/comments
+
+### 댓글 올리기
+POST http://localhost:4000/api/comments
+Content-Type: application/json
+
+{
+  "username": "kuromi",
+  "postId": 1,
+  "text": "니들끼리 뭐라는거야?"
+}

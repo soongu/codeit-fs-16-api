@@ -21,3 +21,23 @@ Content-Type: application/json
   "postAlt": "창밖으로 본 저녁 하늘 사진",
   "content": "오늘의 한 장 📷"
 }
+
+### 게시물 올리기 (빈 페이로드)
+POST http://localhost:3000/api/posts
+Content-Type: application/json
+
+{
+
+}
+
+### 하트 수 고치기
+PATCH http://localhost:3000/api/posts/2
+Content-Type: application/json
+
+{
+  "likeCount": 88
+}
+
+
+### 게시물 지우기
+DELETE http://localhost:3000/api/posts/3
