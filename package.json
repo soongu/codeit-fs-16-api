@@ -1,15 +1,19 @@
 {
   "name": "codeit-api-basic-fs-16",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "app.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch --env-file=.env app.js",
+    "seed": "node --env-file=.env seed.js",
+    "test": "vitest run"
+  },
   "type": "module",
+  "private": true,
   "dependencies": {
     "express": "^5.2.1",
     "mongoose": "^9.10.1"
