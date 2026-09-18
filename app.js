@@ -1,11 +1,14 @@
 // ~/instagram-api/app.js
 import express from 'express';
 import mongoose from 'mongoose';
+import cors from 'cors';
 import Post from './models/Post.js';
 
 const PORT = process.env.PORT ?? 3000;
 
 const app = express();
+
+app.use(cors());
 
 // 모든 요청 초입에 작동해서 클라이언트가 보낸 json을 재조립
 app.use(express.json());
