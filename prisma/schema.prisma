@@ -17,6 +17,7 @@ model Post {
   likeCount    Int       @default(0) @map("like_count")
   commentCount Int       @default(0) @map("comment_count")
   createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at")
   comments     Comment[]
 
   @@map("posts")
