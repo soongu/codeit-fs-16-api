@@ -1,8 +1,7 @@
 // ~/instagram-api/app.js
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
-import Post from './models/Post.js';
+import { prisma } from './db.js';
 
 const PORT = process.env.PORT ?? 3000;
 
@@ -13,9 +12,6 @@ app.use(cors());
 // 모든 요청 초입에 작동해서 클라이언트가 보낸 json을 재조립
 app.use(express.json());
 
-// 몽고디비 연결
-await mongoose.connect(process.env.MONGO_URL);
-console.log('데이터베이스에 연결됐어요.');
 
 app.get('/', (req, res) => {
   res.send('인스타그램 서버가 살아 있어요');
@@ -23,7 +19,7 @@ app.get('/', (req, res) => {
 
 // 전체 게시물 목록 서빙
 app.get('/api/posts', async (req, res) => { 
-  const posts = await Post.find();
+  const posts = await prisma.post.findMany(); // SELECT * FROM posts;
   res.json(posts);
 });
 
