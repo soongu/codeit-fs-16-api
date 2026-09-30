@@ -19,7 +19,10 @@ app.get('/', (req, res) => {
 
 // 전체 게시물 목록 서빙
 app.get('/api/posts', async (req, res) => { 
-  const posts = await prisma.post.findMany(); // SELECT * FROM posts;
+
+  const posts = await prisma.post.findMany({
+    where: { username: req.query.username }
+  }); // SELECT * FROM posts WHERE username = 'minji';
   res.json(posts);
 });
 
@@ -108,6 +111,7 @@ app.delete('/api/posts/:id', async (req, res) => {
     where: { id }
   });
 
+
   res.json(deleted);
 });
 
@@ -120,9 +124,10 @@ app.use((req, res) => {
 });
 
 
+// 전역 예외처리 구간 
 app.use((err, req, res, next) => {
 
-  if (err.name === 'CastError') {
+  if (err.code === 'P2025') {
     res.status(404).json({ message: '그런 게시물은 없어요' });
     return;
   }
