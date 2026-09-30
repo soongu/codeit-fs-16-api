@@ -26,7 +26,16 @@ app.get('/api/posts', async (req, res) => {
 // 단일 게시물 서빙
 app.get('/api/posts/:id', async (req, res) => {
 
-  const post = await Post.findById(req.params.id);
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id)) {
+    res.status(404).json({ message: '그런 게시물은 없어요' });
+    return;
+  }
+
+  const post = await prisma.post.findUnique({
+    where: { id }
+  });
 
   if (!post) {
     res.status(404).json({
@@ -38,10 +47,11 @@ app.get('/api/posts/:id', async (req, res) => {
   res.json(post);
 });
 
+
 app.post('/api/posts', async (req, res) => {
 
   // 입력값 검증 (validation)
-  const { username, postImage } = req.body;
+  const { username, profileImage, postImage, postAlt, content } = req.body;
 
   if (!username || !postImage) {
     res.status(400).json({ message: 'username과 postImage는 꼭 있어야 해요' });
@@ -49,8 +59,8 @@ app.post('/api/posts', async (req, res) => {
   }
 
   // 실제로 게시물을 추가해 줘야함.
-  const newPost = await Post.create({
-    ...req.body
+  const newPost = await prisma.post.create({
+    data: { username, profileImage, postImage, postAlt, content },
   });
 
   res.status(201).json(newPost);

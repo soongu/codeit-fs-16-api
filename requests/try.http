@@ -1,0 +1,10 @@
+GET http://localhost:3000/api/posts/메롱
+
+POST http://localhost:3000/api/posts
+Content-Type: application/json
+
+{
+  "id": 777,
+  "username": "hacker",
+  "postImage": "/images/post-9.jpg"
+}
