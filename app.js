@@ -69,14 +69,25 @@ app.post('/api/posts', async (req, res) => {
 // 좋아요 수정요청
 app.patch('/api/posts/:id', async (req, res) => {
 
-  const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
-    returnDocument: 'after',
-  });
+  const id = Number(req.params.id);
 
-  if (!post) {
+  if (!Number.isInteger(id)) {
     res.status(404).json({ message: '그런 게시물은 없어요' });
     return;
   }
+
+  const { username, profileImage, postImage, postAlt, content, likeCount } =
+    req.body;
+
+  /*
+      UPDATE posts
+      SET like_count = ?, content = ?, ...
+      WHERE id = ?
+  */
+  const post = await prisma.post.update({
+    where: { id },
+    data: { username, profileImage, postImage, postAlt, content, likeCount },
+  });
 
 
   res.json(post);
@@ -84,13 +95,18 @@ app.patch('/api/posts/:id', async (req, res) => {
 
 // 게시물 삭제
 app.delete('/api/posts/:id', async (req, res) => {
-  
-  const deleted = await Post.findByIdAndDelete(req.params.id);
 
-  if (!deleted) {
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id)) {
     res.status(404).json({ message: '그런 게시물은 없어요' });
     return;
   }
+  
+  // DELETE FROM posts WHERE id = ? 
+  const deleted = await prisma.post.delete({
+    where: { id }
+  });
 
   res.json(deleted);
 });
