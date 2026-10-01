@@ -1,5 +1,4 @@
 import express from 'express';
-import { prisma } from '../db.js';
 import * as postService from '../services/postService.js';
 
 const router = express.Router();
@@ -50,8 +49,8 @@ router.post('/', async (req, res) => {
   }
 
   // 실제로 게시물을 추가해 줘야함.
-  const newPost = await prisma.post.create({
-    data: { username, profileImage, postImage, postAlt, content },
+  const newPost = await postService.createPost({
+    username, profileImage, postImage, postAlt, content
   });
 
   res.status(201).json(newPost);
@@ -62,14 +61,13 @@ router.patch('/:id', parseId, async (req, res) => {
 
   const { username, profileImage, postImage, postAlt, content, likeCount } = req.body;
 
-  /*
-      UPDATE posts
-      SET like_count = ?, content = ?, ...
-      WHERE id = ?
-  */
-  const post = await prisma.post.update({
-    where: { id: req.postId },
-    data: { username, profileImage, postImage, postAlt, content, likeCount },
+  const post = await postService.updatePost(req.postId, {
+    username,
+    profileImage,
+    postImage,
+    postAlt,
+    content,
+    likeCount,
   });
 
   res.json(post);
@@ -79,9 +77,7 @@ router.patch('/:id', parseId, async (req, res) => {
 router.delete('/:id', parseId, async (req, res) => {
 
   // DELETE FROM posts WHERE id = ?
-  const deleted = await prisma.post.delete({
-    where: { id: req.postId },
-  });
+  const deleted = await postService.removePost(req.postId);
 
   res.json(deleted);
 });
