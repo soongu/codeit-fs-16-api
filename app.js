@@ -21,8 +21,10 @@ app.get('/', (req, res) => {
 app.get('/api/posts', async (req, res) => { 
 
   const posts = await prisma.post.findMany({
-    where: { username: req.query.username }
-  }); // SELECT * FROM posts WHERE username = 'minji';
+    where: { username: req.query.username },
+    orderBy: { createdAt: 'desc' },
+    take: Number(req.query.limit) || undefined
+  }); // SELECT * FROM posts WHERE username = 'minji' ORDER BY created_at DESC LIMIT 2;
   res.json(posts);
 });
 
