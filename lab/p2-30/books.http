@@ -1,0 +1,8 @@
+## 도서 전체 목록 조회
+GET http://localhost:4000/api/books
+
+## 저자로 필터링한 도서 목록 조회
+GET http://localhost:4000/api/books?author=로버트 마틴
+
+## 없는 저자로 필터링한 도서 목록 조회
+GET http://localhost:4000/api/books?author=로켓단
