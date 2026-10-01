@@ -70,6 +70,11 @@ router.patch('/:id', parseId, async (req, res) => {
     likeCount,
   });
 
+  if (!post) {
+    res.status(404).json({ message: '그런 게시물은 없어요' });
+    return;
+  }
+
   res.json(post);
 });
 
@@ -78,6 +83,11 @@ router.delete('/:id', parseId, async (req, res) => {
 
   // DELETE FROM posts WHERE id = ?
   const deleted = await postService.removePost(req.postId);
+
+  if (!deleted) {
+    res.status(404).json({ message: '그런 게시물은 없어요' });
+    return;
+  }
 
   res.json(deleted);
 });

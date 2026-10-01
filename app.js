@@ -30,10 +30,6 @@ app.use((req, res) => {
 // 전역 예외처리 구간 
 app.use((err, req, res, next) => {
 
-  if (err.code === 'P2025') {
-    res.status(404).json({ message: '그런 게시물은 없어요' });
-    return;
-  }
 
   if (err.status) {
     res.status(err.status).json({ message: '보낸 내용을 읽을 수 없어요' });
