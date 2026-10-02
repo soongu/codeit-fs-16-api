@@ -1,5 +1,6 @@
 import express from 'express';
 import * as postService from '../services/postService.js';
+import { NotFoundError } from '../errors.js';
 
 const router = express.Router();
 
@@ -29,14 +30,7 @@ router.get('/:id', parseId, async (req, res) => {
 
   const post = await postService.getPost(req.postId);
 
-  if (!post) {
-    res.status(404).json({
-      message: '그런 게시물은 존재하지 않습니다.',
-    });
-    return;
-  }
-
-  res.json(post);
+  res.status(200).json(post);
 });
 
 router.post('/', async (req, res) => {
@@ -70,11 +64,6 @@ router.patch('/:id', parseId, async (req, res) => {
     likeCount,
   });
 
-  if (!post) {
-    res.status(404).json({ message: '그런 게시물은 없어요' });
-    return;
-  }
-
   res.json(post);
 });
 
@@ -83,11 +72,6 @@ router.delete('/:id', parseId, async (req, res) => {
 
   // DELETE FROM posts WHERE id = ?
   const deleted = await postService.removePost(req.postId);
-
-  if (!deleted) {
-    res.status(404).json({ message: '그런 게시물은 없어요' });
-    return;
-  }
 
   res.json(deleted);
 });
