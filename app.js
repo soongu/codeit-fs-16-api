@@ -20,6 +20,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/posts', postsRouter);
 
+
 // 404 처리를 기본설정에서 커스텀설정으로 변경
 app.use((req, res) => {
   res.status(404).json({
@@ -33,7 +34,9 @@ app.use((err, req, res, next) => {
 
   // 서비스쪽에서 에러를 던지면 받아줄 코드를 작성
   if (err instanceof HttpError) {
-    res.status(err.status).json({ message: err.message });
+    const body = { message: err.message };
+    if (err.details) body.details = err.details;
+    res.status(err.status).json(body);
     return;
   }
 

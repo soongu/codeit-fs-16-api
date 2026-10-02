@@ -1,6 +1,10 @@
 import express from 'express';
 import * as postService from '../services/postService.js';
 import { NotFoundError } from '../errors.js';
+import {
+  validateBody
+} from '../middlewares/validate.js';
+import { postCreateSchema, postUpdateSchema } from '../schemas/postSchema.js';
 
 const router = express.Router();
 
@@ -9,7 +13,7 @@ function parseId(req, res, next) {
   const id = Number(req.params.id);
 
   if (!Number.isInteger(id)) {
-    res.status(404).json({ message: '그런 게시물은 없어요' });
+    next(new NotFoundError('그런 게시물은 없어요.'));
     return;
   }
   req.postId = id; // 검증이 끝난 id를 req에 저장
@@ -33,36 +37,19 @@ router.get('/:id', parseId, async (req, res) => {
   res.status(200).json(post);
 });
 
-router.post('/', async (req, res) => {
-  // 입력값 검증 (validation)
-  const { username, profileImage, postImage, postAlt, content } = req.body;
 
-  if (!username || !postImage) {
-    res.status(400).json({ message: 'username과 postImage는 꼭 있어야 해요' });
-    return;
-  }
+router.post('/', validateBody(postCreateSchema), async (req, res) => {
 
   // 실제로 게시물을 추가해 줘야함.
-  const newPost = await postService.createPost({
-    username, profileImage, postImage, postAlt, content
-  });
+  const newPost = await postService.createPost(req.body);
 
   res.status(201).json(newPost);
 });
 
 // 좋아요 수정요청
-router.patch('/:id', parseId, async (req, res) => {
+router.patch('/:id', parseId, validateBody(postUpdateSchema), async (req, res) => {
 
-  const { username, profileImage, postImage, postAlt, content, likeCount } = req.body;
-
-  const post = await postService.updatePost(req.postId, {
-    username,
-    profileImage,
-    postImage,
-    postAlt,
-    content,
-    likeCount,
-  });
+  const post = await postService.updatePost(req.postId, req.body);
 
   res.json(post);
 });

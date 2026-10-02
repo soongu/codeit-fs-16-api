@@ -5,15 +5,14 @@ Content-Type: application/json
 
 {
   "id": 777,
-  "username": "hacker",
-  "postImage": "/images/post-9.jpg"
+  "username": "dfsajhfdklsahfkdsahfklsajdhfkjsdahfkdjsahfkldsahfkldasjhfkjsadfhksadljfhdksaljfhsadkljfhsadkljfhsakljfdhsaflkhjdsf"
 }
 
-PATCH http://localhost:3000/api/posts/9999
+PATCH http://localhost:3000/api/posts/1
 Content-Type: application/json
 
 {
-  "likeCount": 7
+  "likeCount": "많이"
 }
 
 GET http://localhost:3000/api/posts
