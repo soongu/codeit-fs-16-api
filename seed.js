@@ -32,25 +32,20 @@ await prisma.user.createMany({
 const users = await prisma.user.findMany();
 const idOf = (username) => users.find((user) => user.username === username).id;
 
-await prisma.post.createMany({
-  data: posts.map(({ username, profileImage, images, ...post }) => ({
-    ...withTimes(post),
-    authorId: idOf(username),
-  })),
-});
+// 게시물과 그 사진을 «한 번에» 만든다.
+// 번호를 나중에 다시 읽어서 채워 넣을 일이 없다.
+for (const { username, profileImage, images, ...post } of posts) {
+  await prisma.post.create({
+    data: {
+      ...withTimes(post),
+      authorId: idOf(username),
+      images: {
+        create: images.map((imageUrl, order) => ({ imageUrl, imgOrder: order + 1 })),
+      },
+    },
+  });
+}
 
-// 사진은 이제 게시물의 컬럼이 아니라 따로 있는 테이블이라, 게시물을 넣은 «뒤에» 번호를 보고 넣는다.
-// 넣은 차례대로 번호가 매겨지니 목록 순서가 그대로 게시물 순서다.
-const createdPosts = await prisma.post.findMany({ orderBy: { id: 'asc' } });
-
-await prisma.postImage.createMany({
-  data: createdPosts.flatMap((post, index) =>
-    posts[index].images.map((imageUrl, order) => ({
-      postId: post.id,
-      imageUrl,
-      imgOrder: order + 1,
-    }))),
-});
 
 // 원댓글 저장, 대댓글을 다 버림
 await prisma.comment.createMany({

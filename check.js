@@ -3,41 +3,33 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
 
-const posts = await prisma.post.findMany({ orderBy: { id: 'asc' } });
-// console.log(`게시물${posts.length}개를 읽었어요.`);
-
-const withComments = await prisma.post.findMany({
-  include: { comments: true },
-  orderBy: { id: 'asc' },
-});
-// console.log(withComments);
-
-for (const post of withComments) {
-  console.log(`첫번째 댓글 정보: `, post.comments[0]);
-  console.log(`${post.id}번${post.postAlt} — 댓글${post.comments.length}개`);
-}
-
-// 답글은 원댓글과 «같은 테이블» 에 있다. 그래서 그냥 읽으면 둘이 섞여 나온다.
-const all = await prisma.comment.findMany();
-console.log(`\ncomments 테이블의 행은 모두${all.length}개예요.`);
-
-// 원댓글만 고르려면 「가리키는 원댓글이 없는 줄」을 찾는다.
-const roots = await prisma.comment.findMany({
-  where: { parentId: null },
-  include: { replies: true },
-  orderBy: { id: 'asc' },
+// 보낸 쿼리를 세어보려고 로그를 받는다. 터미널에 바로 찍는 대신 우리가 센다.
+const prisma = new PrismaClient({
+  adapter,
+  log: [{ emit: 'event', level: 'query' }],
 });
 
-console.log(`그중 원댓글은${roots.length}개고, 나머지는 어딘가에 달린 답글이에요.\n`);
+let sent = 0;
+prisma.$on('query', () => {
+  sent += 1;
+});
 
-for (const comment of roots) {
-  console.log(`${comment.id}번 "${comment.content}" — 답글${comment.replies.length}개`);
-  for (const reply of comment.replies) {
-    console.log(`    └${reply.id}번 "${reply.content}"`);
-  }
+// ① 하나씩 읽기 — 게시물을 읽은 뒤 글쓴이와 사진은 게시물마다 따로 물어본다.
+sent = 0;
+const posts = await prisma.post.findMany();
+
+for (const post of posts) {
+  await prisma.user.findUnique({ where: { id: post.authorId } });
+  await prisma.postImage.findMany({ where: { postId: post.id } });
 }
 
+console.log(`하나씩 읽기 — 게시물${posts.length}개에 쿼리${sent}번`);
+
+// ② 함께 읽기 — 똑같은 것을 Prisma 호출 한 번으로.
+sent = 0;
+await prisma.post.findMany({ include: { author: true, images: true } });
+
+console.log(`함께 읽기 — 게시물${posts.length}개에 쿼리${sent}번`);
 
 await prisma.$disconnect();
