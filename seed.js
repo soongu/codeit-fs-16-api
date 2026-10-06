@@ -8,7 +8,7 @@ function withTimes({ minutesAgo, ...row }) {
   return { ...row, createdAt, updatedAt: createdAt };
 }
 
-await prisma.$executeRaw`TRUNCATE TABLE post_images, comments, posts, users RESTART IDENTITY`;
+await prisma.$executeRaw`TRUNCATE TABLE post_likes, post_images, comments, posts, users RESTART IDENTITY`;
 
 // 사람을 먼저 넣는다 — 게시물과 댓글이 가리킬 대상이라서.
 // 게시물은 안 쓰고 댓글만 쓴 사람도 있으니 두 목록을 함께 훑는다.

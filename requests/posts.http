@@ -46,3 +46,9 @@ Content-Type: application/json
 
 ### 게시물 지우기
 DELETE http://localhost:3000/api/posts/{{created.id}}
+
+### 좋아요 누르기
+PUT http://localhost:3000/api/posts/3/likes/2
+
+### 좋아요 취소
+DELETE http://localhost:3000/api/posts/3/likes/2
