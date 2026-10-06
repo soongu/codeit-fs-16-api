@@ -6,12 +6,16 @@ import { NotFoundError } from '../errors.js';
 // 이미 눌렀으면 행이 안 들어가고(count 0), 숫자도 오르지 않는다.
 export async function likePost(postId, userId) {
   try {
-    const { count } = await prisma.postLike.createMany({
-      data: [{ postId, userId }],
-      skipDuplicates: true,
-    });
+    // 행을 넣는 일과 숫자를 고치는 일은 «함께» 끝나야 한다.
+    // 하나라도 실패하면 둘 다 없던 일이 된다.
+    return await prisma.$transaction(async (tx) => {
+      const { count } = await tx.postLike.createMany({
+        data: [{ postId, userId }],
+        skipDuplicates: true,
+      });
 
-    return await changeLikeCount(postId, count, true);
+      return changeLikeCount(tx, postId, count, true);
+    });
   } catch (error) {
     if (error.code === 'P2003')
       throw new NotFoundError('그런 게시물이나 사용자는 없어요');
