@@ -19,6 +19,7 @@ model Post {
   updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at")
   comments     Comment[]
   images       PostImage[]
+  likes        PostLike[]  
 
   @@map("posts")
 }
@@ -46,6 +47,7 @@ model User {
   profileImage String?   @map("profile_image")
   posts        Post[]
   comments     Comment[]
+  likes        PostLike[]
 
   @@map("users")
 }
@@ -58,4 +60,17 @@ model PostImage {
   imgOrder Int    @map("img_order")
 
   @@map("post_images")
+}
+
+// 여럿이 여럿을 가리키는 관계는 «가운데 테이블» 이 받는다.
+// 한 행이 「누가 어느 게시물에 눌렀는가」 한 쌍이고, 같은 쌍은 한 번만 들어간다.
+model PostLike {
+  id     Int  @id @default(autoincrement())
+  postId Int  @map("post_id")
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@map("post_likes")
 }
