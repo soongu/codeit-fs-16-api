@@ -1,31 +1,44 @@
+// ~/instagram-api/services/postService.js
 import { prisma } from '../db.js';
-import { NotFoundError, BadRequestError } from '../errors.js';
+import { BadRequestError, NotFoundError } from '../errors.js';
 
-// 게시물 목록 전체 조회
-export function getPosts({ username, limit }) {
-  return prisma.post.findMany({
-    where: { username },
+// 저장하는 모양과 내보내는 모양은 다르다.
+// 테이블에는 글쓴이가 번호로 적혀 있지만, 화면에 필요한 것은 이름과 사진이다.
+function withAuthor({ author, ...post }) {
+  return {
+    ...post,
+    username: author.username,
+    profileImage: author.profileImage,
+  };
+}
+
+export async function getPosts({ username, limit }) {
+  const posts = await prisma.post.findMany({
+    where: { author: { username } },
+    include: { author: true },
     orderBy: { createdAt: 'desc' },
     take: limit,
-    include: { author: true }
-  }); // SELECT * FROM posts WHERE username = 'minji' ORDER BY created_at DESC LIMIT 2;
+  });
+
+  return posts.map(withAuthor);
 }
 
-// 단일 게시물 조회
 export async function getPost(id) {
-  const post = await prisma.post.findUnique({ where: { id } });
+  const post = await prisma.post.findUnique({
+    where: { id },
+    include: { author: true },
+  });
 
-  if (!post) {
-    throw new NotFoundError('그런 게시물은 없습니다.');
-  }
+  if (!post) throw new NotFoundError('그런 게시물은 없어요');
 
-  return post;
+  return withAuthor(post);
 }
 
-// 게시물 생성
 export async function createPost(data) {
   try {
-    return await prisma.post.create({ data });
+    const post = await prisma.post.create({ data, include: { author: true } });
+
+    return withAuthor(post);
   } catch (error) {
     if (error.code === 'P2003')
       throw new BadRequestError('그런 사용자는 없어요');
@@ -35,7 +48,13 @@ export async function createPost(data) {
 
 export async function updatePost(id, data) {
   try {
-    return await prisma.post.update({ where: { id }, data });
+    const post = await prisma.post.update({
+      where: { id },
+      data,
+      include: { author: true },
+    });
+
+    return withAuthor(post);
   } catch (error) {
     if (error.code === 'P2025') throw new NotFoundError('그런 게시물은 없어요');
     if (error.code === 'P2003')
@@ -46,7 +65,12 @@ export async function updatePost(id, data) {
 
 export async function removePost(id) {
   try {
-    return await prisma.post.delete({ where: { id } });
+    const post = await prisma.post.delete({
+      where: { id },
+      include: { author: true },
+    });
+
+    return withAuthor(post);
   } catch (error) {
     if (error.code === 'P2025') throw new NotFoundError('그런 게시물은 없어요');
     throw error;

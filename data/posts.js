@@ -3,7 +3,11 @@ export const posts = [
   {
     username: 'jaehoon',
     profileImage: '/images/jaehoon.jpg',
-    postImage: '/images/post-1.jpg',
+    images: [
+      '/images/post-1.jpg',
+      '/images/post-1b.jpg',
+      '/images/post-1c.jpg',
+    ],
     postAlt: '노을 진 한강',
     content: '퇴근길에 한강이 너무 예뻤어요',
     minutesAgo: 12,
