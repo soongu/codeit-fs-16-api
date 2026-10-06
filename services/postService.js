@@ -3,42 +3,59 @@ import { prisma } from '../db.js';
 import { BadRequestError, NotFoundError } from '../errors.js';
 
 // 저장하는 모양과 내보내는 모양은 다르다.
-// 테이블에는 글쓴이가 번호로 적혀 있지만, 화면에 필요한 것은 이름과 사진이다.
-function withAuthor({ author, ...post }) {
+// 테이블은 글쓴이를 번호로, 사진을 딴 테이블의 행으로 갖고 있지만,
+// 화면에 필요한 것은 이름 한 줄과 사진 주소 목록이다.
+function flatten({ author, images, ...post }) {
   return {
     ...post,
     username: author.username,
     profileImage: author.profileImage,
+    imageUrls: images.map((image) => image.imageUrl),
   };
 }
+
+// 사진은 언제나 차례대로 읽는다 — 캐러셀이 넘기는 순서가 이 차례다.
+const withRelations = {
+  author: true,
+  images: { orderBy: { imgOrder: 'asc' } },
+};
 
 export async function getPosts({ username, limit }) {
   const posts = await prisma.post.findMany({
     where: { author: { username } },
-    include: { author: true },
+    include: withRelations,
     orderBy: { createdAt: 'desc' },
     take: limit,
   });
 
-  return posts.map(withAuthor);
+  return posts.map(flatten);
 }
 
 export async function getPost(id) {
   const post = await prisma.post.findUnique({
     where: { id },
-    include: { author: true },
+    include: withRelations,
   });
 
   if (!post) throw new NotFoundError('그런 게시물은 없어요');
 
-  return withAuthor(post);
+  return flatten(post);
 }
 
-export async function createPost(data) {
+export async function createPost({ imageUrls, ...data }) {
   try {
-    const post = await prisma.post.create({ data, include: { author: true } });
+    const post = await prisma.post.create({ data });
 
-    return withAuthor(post);
+    // 사진은 게시물의 컬럼이 아니라 딴 테이블의 행이라, 게시물이 생겨 번호를 받은 «뒤에» 넣는다.
+    await prisma.postImage.createMany({
+      data: imageUrls.map((imageUrl, order) => ({
+        postId: post.id,
+        imageUrl,
+        imgOrder: order + 1,
+      })),
+    });
+
+    return getPost(post.id);
   } catch (error) {
     if (error.code === 'P2003')
       throw new BadRequestError('그런 사용자는 없어요');
@@ -54,7 +71,7 @@ export async function updatePost(id, data) {
       include: { author: true },
     });
 
-    return withAuthor(post);
+    return flatten(post);
   } catch (error) {
     if (error.code === 'P2025') throw new NotFoundError('그런 게시물은 없어요');
     if (error.code === 'P2003')
@@ -70,7 +87,7 @@ export async function removePost(id) {
       include: { author: true },
     });
 
-    return withAuthor(post);
+    return flatten(post);
   } catch (error) {
     if (error.code === 'P2025') throw new NotFoundError('그런 게시물은 없어요');
     throw error;
