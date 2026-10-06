@@ -6,6 +6,20 @@ export const comments = [
     content: '저도 가봤어요',
     likeCount: 7,
     minutesAgo: 8,
+    replies: [
+      {
+        username: 'jaehoon',
+        content: '다음엔 같이 가요',
+        likeCount: 1,
+        minutesAgo: 3,
+      },
+      {
+        username: 'dahye',
+        content: '저도 껴주세요',
+        likeCount: 0,
+        minutesAgo: 2,
+      },
+    ],
   },
   {
     postId: 1,
@@ -27,6 +41,14 @@ export const comments = [
     content: '크루아상 색이 좋네요',
     likeCount: 12,
     minutesAgo: 40,
+    replies: [
+      {
+        username: 'minji',
+        content: '이번엔 잘 구워졌어요',
+        likeCount: 4,
+        minutesAgo: 35,
+      },
+    ],
   },
   {
     postId: 2,

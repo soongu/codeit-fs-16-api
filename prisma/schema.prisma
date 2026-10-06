@@ -33,7 +33,10 @@ model Comment {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
+  parentId  Int?     @map("parent_id")
+  parent    Comment?  @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("Replies")
+ 
   @@map("comments")
 }
 
